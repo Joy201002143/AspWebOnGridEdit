@@ -96,6 +96,116 @@ namespace OnGridEdit
                 }
             }
         }
-        
+        private DataTable CreateDataTable()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("EMPID");
+            dt.Columns.Add("Name");
+            dt.Columns.Add("Company");
+            dt.Columns.Add("Department");
+            dt.Columns.Add("Designation");
+            dt.Columns.Add("Salary");
+            return dt;
+        }
+
+        private void LoadDataFromDatabase(DataTable dt)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            {
+                string query = "SELECT EMPID, Name, Company, Department, Designation, Salary, CompanyID, DepartmentID   FROM [dbo].[Emp]";
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                da.Fill(dt);
+            }
+        }
+
+        private void BindGrid(DataTable dt)
+        {
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+
+
+            if (GridView1.Rows.Count > 0)
+            {
+
+                GridViewRow newGridViewRow = GridView1.Rows[GridView1.Rows.Count - 1];
+                CheckBox chkSelect = (CheckBox)newGridViewRow.FindControl("chkSelect");
+                if (chkSelect != null)
+                {
+                    chkSelect.Checked = true;
+                }
+            }
+            else
+            {
+
+
+                if (dt != null)
+                {
+                    DataRow newRow = dt.NewRow();
+                    dt.Rows.Add(newRow);
+
+                    GridView1.DataSource = dt;
+                    GridView1.DataBind();
+
+                    GridViewRow emptyRow = GridView1.Rows[GridView1.Rows.Count - 1];
+                    CheckBox chkSelect = (CheckBox)emptyRow.FindControl("chkSelect");
+                    if (chkSelect != null)
+                    {
+                        chkSelect.Checked = false;
+                    }
+                }
+            }
+
+
+        }
+
+        private void AddEmptyRow(DataTable dt)
+        {
+            DataRow newRow = dt.NewRow();
+            newRow["Name"] = string.Empty;
+            newRow["Company"] = string.Empty;
+            newRow["Department"] = string.Empty;
+            newRow["Designation"] = string.Empty;
+            newRow["Salary"] = string.Empty;
+            dt.Rows.Add(newRow);
+        }
+
+        protected void btnAdd_Click(object sender, EventArgs e)
+        {
+            DataTable dt = (DataTable)Session["DataTable"];
+
+            foreach (GridViewRow row in GridView1.Rows)
+            {
+                TextBox txtName = (TextBox)row.FindControl("txtName");
+                TextBox txtCname = (TextBox)row.FindControl("txtCname");
+                TextBox txtDepartment = (TextBox)row.FindControl("txtDepartment");
+                TextBox txtDesignation = (TextBox)row.FindControl("txtDesignation");
+                TextBox txtSalary = (TextBox)row.FindControl("txtSalary");
+
+                if (txtName != null && txtCname != null && txtDepartment != null && txtDesignation != null && txtSalary != null)
+                {
+                    dt.Rows[row.RowIndex]["Name"] = txtName.Text;
+                    dt.Rows[row.RowIndex]["Company"] = txtCname.Text;
+                    dt.Rows[row.RowIndex]["Department"] = txtDepartment.Text;
+                    dt.Rows[row.RowIndex]["Designation"] = txtDesignation.Text;
+                    dt.Rows[row.RowIndex]["Salary"] = txtSalary.Text;
+                }
+            }
+
+            AddEmptyRow(dt);
+
+            Session["DataTable"] = dt;
+            BindGrid(dt);
+            foreach (GridViewRow row in GridView1.Rows)
+            {
+                TextBox txtID = (TextBox)row.FindControl("txtID");
+                CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
+
+                if (txtID != null && string.IsNullOrEmpty(txtID.Text) && chkSelect != null)
+                {
+                    chkSelect.Checked = true;
+                }
+            }
+        }
+
     }
 }
