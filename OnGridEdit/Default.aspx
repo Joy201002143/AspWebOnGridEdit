@@ -1,4 +1,5 @@
-﻿
+﻿<%@ Page Title="Employee Management" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="OnGridEdit._Default" %>
+
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container mt-4">
         <div class="card shadow-sm">
@@ -22,8 +23,58 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
+                            <asp:TemplateField HeaderText="Employee ID" Visible="false">
+                                <ItemTemplate>
+                                    <asp:TextBox ID="txtID" runat="server" Text='<%# Eval("EMPID") %>' Visible="false"></asp:TextBox>
+                                </ItemTemplate>
+                            </asp:TemplateField>
 
+                            <asp:TemplateField HeaderText="Employee Name">
+                                <ItemTemplate>
+                                    <asp:TextBox ID="txtName" runat="server" CssClass="form-control" Text='<%# Eval("Name") %>'></asp:TextBox>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Company Name">
+                                <ItemTemplate>
+                                    <asp:DropDownList ID="ddlCompany" runat="server" CssClass="form-control"></asp:DropDownList>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Department">
+                                <ItemTemplate>
+                                    <asp:DropDownList ID="ddlDepartment" runat="server" CssClass="form-control"></asp:DropDownList>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+
+                            <asp:TemplateField HeaderText="Designation">
+                                <ItemTemplate>
+                                    <asp:TextBox ID="txtDesignation" runat="server" CssClass="form-control" Text='<%# Eval("Designation") %>'></asp:TextBox>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Joining Salary">
+                                <ItemTemplate>
+                                    <asp:TextBox ID="txtSalary" runat="server" CssClass="form-control" Text='<%# Eval("Salary") %>'></asp:TextBox>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
+
+                    <sdiv class="d-flex justify-content-between mt-4">
+                        <asp:Button ID="btnAdd" runat="server" Text="Add Row" CssClass="btn btn-primary" OnClick="btnAdd_Click" />
+                        <asp:Button ID="btnSave" runat="server" Text="Save Data" CssClass="btn btn-success" OnClick="btnSave_Click" />
+                        <asp:Button
+                            ID="btnDelete"
+                            runat="server"
+                            Text="Delete Selected"
+                            CssClass="btn btn-danger"
+                            OnClick="btnDelete_Click"
+                            OnClientClick="return confirm('Are you sure you want to delete?');" />
+                    </sdiv>
+                </asp:Panel>
+            </div>
         </div>
-    </main>
-
+    </div>
 </asp:Content>

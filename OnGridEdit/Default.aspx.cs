@@ -133,7 +133,7 @@ namespace OnGridEdit
                 {
                     chkSelect.Checked = true;
                 }
-            }
+        }
             else
             {
 
@@ -206,6 +206,115 @@ namespace OnGridEdit
                 }
             }
         }
+        private List<string> GetExistingEmpIds()
+        {
+            List<string> existingEmpIds = new List<string>();
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            {
+                conn.Open();
+                string query = "SELECT EMPID FROM [dbo].[Emp]";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        existingEmpIds.Add(reader["EMPID"].ToString());
+                    }
+                }
+            }
+            return existingEmpIds;
+        }
 
+        private void UpdateEmployee(SqlConnection conn, string empId, string name, string company, string department, string designation, string salary)
+        {
+            string query = "UPDATE [dbo].[Emp] SET Name = @Name, Company = @Company, Department = @Department, Designation = @Designation, Salary = @Salary WHERE EMPID = @EMPID";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Company", company);
+                cmd.Parameters.AddWithValue("@Department", department);
+                cmd.Parameters.AddWithValue("@Designation", designation);
+                cmd.Parameters.AddWithValue("@Salary", salary);
+                cmd.Parameters.AddWithValue("@EMPID", empId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void InsertEmployee(SqlConnection conn, string name, string company, string department, string designation, string salary)
+        {
+            string query = "INSERT INTO [dbo].[Emp] (Name, Company, Department, Designation, Salary) VALUES (@Name, @Company, @Department, @Designation, @Salary)";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Company", company);
+                cmd.Parameters.AddWithValue("@Department", department);
+                cmd.Parameters.AddWithValue("@Designation", designation);
+                cmd.Parameters.AddWithValue("@Salary", salary);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void ReloadData()
+        {
+            DataTable dt = new DataTable();
+            LoadDataFromDatabase(dt);
+            Session["DataTable"] = dt;
+            BindGrid(dt);
+            Response.Redirect(Request.Url.AbsoluteUri);
+        }
+
+        protected void btnDelete_Click(object sender, EventArgs e)
+        {
+            DataTable dt = (DataTable)Session["DataTable"];
+            List<int> rowsToDelete = new List<int>();
+
+            foreach (GridViewRow row in GridView1.Rows)
+            {
+                TextBox txtID = (TextBox)row.FindControl("txtID");
+                if (txtID != null && !string.IsNullOrEmpty(txtID.Text))
+                {
+                    string empId = txtID.Text;
+                    if (IsRowSelected(row))
+                    {
+                        DeleteEmployee(empId);
+                        rowsToDelete.Add(row.RowIndex);
+                    }
+                }
+            }
+
+            foreach (int rowIndex in rowsToDelete.OrderByDescending(i => i))
+            {
+                dt.Rows.RemoveAt(rowIndex);
+            }
+
+            Session["DataTable"] = dt;
+            BindGrid(dt);
+            Response.Redirect(Request.Url.AbsoluteUri);
+        }
+
+        private bool IsRowSelected(GridViewRow row)
+        {
+            CheckBox chkSelect = (CheckBox)row.FindControl("chkSelect");
+            return chkSelect != null && chkSelect.Checked;
+        }
+
+        private void DeleteEmployee(string empId)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
+            {
+                string query = "DELETE FROM [EmpLoyees].[dbo].[Emp] WHERE EMPID = @ID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", empId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+        }
+        protected void btnSave_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
