@@ -9,6 +9,8 @@ namespace OnGridEdit
 {
     public partial class _Default : Page
     {
+        private const string ConnectionString = "Server=DESKTOP-JHB8AON;Database=EmpLoyees;Trusted_Connection=True;";
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
